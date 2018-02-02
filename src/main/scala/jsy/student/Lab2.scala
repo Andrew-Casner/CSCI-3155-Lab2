@@ -87,6 +87,7 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
     e match {
       /* Base Cases */
       case N(n) => N(n)
+      case S(s) => S(s)
       /* Inductive Cases */
       case Print(e1) => println(pretty(eval(env, e1))); Undefined
 
