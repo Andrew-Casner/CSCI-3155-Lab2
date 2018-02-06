@@ -122,7 +122,11 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
             case N(n) => N(toNumber(B(toBoolean(eval(env,e1)) && toBoolean(eval(env,e2)))))
             case S(s) => S(toStr(B(toBoolean(eval(env,e1)) && toBoolean(eval(env,e2)))))
           }
-          case Or    => ???
+          case Or    => eval(env,e1) match {
+            case B(b) =>  if(toBoolean(eval(env,e1))) eval(env,e1) else eval(env,e2)
+            case N(n) =>  N(toNumber(eval(env,e1)))
+            case S(s) =>  S(toStr(eval(env,e2)))
+          }
           case Seq   => ???
         }
       }
