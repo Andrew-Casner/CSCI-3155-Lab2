@@ -86,7 +86,10 @@ class Lab2Spec(lab2: Lab2Like) extends FlatSpec {
     val e2 = N(5)
     val e3 = eval(Binary(Eq, e1, e2))
     assert(e3 === B(true))
-  } 
+    val e4 = S("5")
+    val e5 = eval(Binary(Eq, e1, e4))
+    assert(e5 === B(false))
+  }
   
   it should "return false if two numerical values are not the same" in {
     val e1 = N(5)

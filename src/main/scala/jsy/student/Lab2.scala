@@ -111,7 +111,7 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
           case Minus => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
           case Times => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
           case Div   => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
-          case Eq => ???
+          case Eq    => B(eval(env,e1) == eval(env,e2))
           case Ne => ???
           case Lt => ???
           case Le => ???
