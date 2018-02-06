@@ -62,6 +62,10 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
     require(isValue(v))
     (v: @unchecked) match {
       case N(n) => n
+      case B(true) => 1.0
+      case B(false) => 0.0
+      case S(s) => try s.toDouble catch {case _ => Double.NaN}
+      case Undefined => Double.NaN
       case _ => ???
     }
   }
