@@ -107,10 +107,10 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
       }
       case Binary(bop, e1, e2) => {
         bop match {
-          case Plus =>  N(toNumber(eval(env,e1)) + toNumber(eval(env,e2)))
+          case Plus  => N(toNumber(eval(env,e1)) + toNumber(eval(env,e2)))
           case Minus => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
           case Times => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
-          case Div => ???
+          case Div   => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
           case Eq => ???
           case Ne => ???
           case Lt => ???
