@@ -86,7 +86,9 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
     (v: @unchecked) match {
       case S(s) => s
       case Undefined => "undefined"
-      case _ => ???
+      case B(b) => b.toString()
+      case N(n) => n.toString()
+      case _ => ""
     }
   }
 
