@@ -118,8 +118,8 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
           case Gt     => B(toNumber(eval(env,e1)) > toNumber(eval(env,e2)))
           case Ge     => B(toNumber(eval(env,e1)) >= toNumber(eval(env,e2)))
           case And    => if(toBoolean(eval(env,e1))) eval(env,e2) else eval(env,e1)
-          case Or    => if(toBoolean(eval(env,e1))) eval(env,e1) else eval(env,e2)
-          case Seq   => ???
+          case Or     => if(toBoolean(eval(env,e1))) eval(env,e1) else eval(env,e2)
+          case Seq    => eval(env,e1); eval(env,e2)
         }
       }
       /* Inductive Cases */
