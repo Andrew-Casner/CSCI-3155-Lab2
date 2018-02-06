@@ -86,10 +86,36 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
   def eval(env: Env, e: Expr): Expr = {
     e match {
       /* Base Cases */
+      case Undefined => Undefined
       case N(n) => N(n)
       case S(s) => S(s)
+      case B(b) => B(b)
+      case Unary(uop, e1) => {
+        uop match {
+          case Neg => ???
+          case Not => ???
+        }
+      }
+      case Binary(bop, e1, e2) => {
+        bop match {
+          case Plus =>  ???
+          case Minus => ???
+          case Times => ???
+          case Div => ???
+          case Eq => ???
+          case Ne => ???
+          case Lt => ???
+          case Le => ???
+          case Gt => ???
+          case Ge => ???
+          case And => ???
+          case Or => ???
+          case Seq => ???
+        }
+      }
       /* Inductive Cases */
       case Print(e1) => println(pretty(eval(env, e1))); Undefined
+      case If(e1, e2, e3) => ???
 
       case _ => ???
     }
