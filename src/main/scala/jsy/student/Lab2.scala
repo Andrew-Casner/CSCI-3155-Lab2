@@ -74,7 +74,7 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
     require(isValue(v))
     (v: @unchecked) match {
       case B(b) => b
-      case N(n) => if(n==0.0 || n==Double.NaN) false else true
+      case N(n) => if(n == 0.0 || n == -0.0 || n == Double.NaN) false else true
       case S(s) => if(s=="") false else true
       case Undefined => false
       case _ => false
@@ -107,26 +107,22 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
       }
       case Binary(bop, e1, e2) => {
         bop match {
-          case Plus  => N(toNumber(eval(env,e1)) + toNumber(eval(env,e2)))
-          case Minus => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
-          case Times => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
-          case Div   => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
-          case Eq    => B(eval(env,e1) == eval(env,e2))
-          case Ne    => B(eval(env,e1) != eval(env,e2))
-          case Lt    => B(toNumber(eval(env,e1)) < toNumber(eval(env,e2)))
-          case Le    => B(toNumber(eval(env,e1)) <= toNumber(eval(env,e2)))
-          case Gt    => B(toNumber(eval(env,e1)) > toNumber(eval(env,e2)))
-          case Ge    => B(toNumber(eval(env,e1)) >= toNumber(eval(env,e2)))
-          case And   => eval(env, e1) match {
-            case B(b) => B(toBoolean(eval(env,e1)) && toBoolean(eval(env,e2)))
-            case N(n) => N(toNumber(B(toBoolean(eval(env,e1)) && toBoolean(eval(env,e2)))))
-            case S(s) => S(toStr(B(toBoolean(eval(env,e1)) && toBoolean(eval(env,e2)))))
-          }
-          case Or    => eval(env,e1) match {
+          case Plus   => N(toNumber(eval(env,e1)) + toNumber(eval(env,e2)))
+          case Minus  => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
+          case Times  => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
+          case Div    => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
+          case Eq     => B(eval(env,e1) == eval(env,e2))
+          case Ne     => B(eval(env,e1) != eval(env,e2))
+          case Lt     => B(toNumber(eval(env,e1)) < toNumber(eval(env,e2)))
+          case Le     => B(toNumber(eval(env,e1)) <= toNumber(eval(env,e2)))
+          case Gt     => B(toNumber(eval(env,e1)) > toNumber(eval(env,e2)))
+          case Ge     => B(toNumber(eval(env,e1)) >= toNumber(eval(env,e2)))
+          case Or     => eval(env,e1) match {
             case B(b) =>  if(toBoolean(eval(env,e1))) eval(env,e1) else eval(env,e2)
             case N(n) =>  N(toNumber(eval(env,e1)))
             case S(s) =>  S(toStr(eval(env,e2)))
           }
+          case And    => if(toBoolean(eval(env,e1))) eval(env,e2) else eval(env,e1)
           case Seq   => ???
         }
       }
