@@ -54,11 +54,59 @@ class Lab2Spec(lab2: Lab2Like) extends FlatSpec {
     assert(e3 === N(3))
   }
 
+  it should "append two string values and return a string" in {
+    val e1 = S("a")
+    val e2 = S("b")
+    val e3 = eval(Binary(Plus, e1, e2))
+    assert(e3 === S("ab"))
+  }
+
+  it should "add two binary values and return a number" in {
+    val e1 = B(true)
+    val e2 = B(false)
+    val e3 = eval(Binary(Plus, e1, e2))
+    assert(e3 === N(1))
+
+    val e4 = B(true)
+    val e5 = B(true)
+    val e6 = eval(Binary(Plus, e4, e5))
+    assert(e6 === N(2))
+
+    val e7 = B(false)
+    val e8 = B(false)
+    val e9 = eval(Binary(Plus, e7, e8))
+    assert(e9 === N(0))
+  }
+
+  it should "append a string and an undefined values and return a string" in {
+    val e1 = S("a")
+    val e2 = Undefined
+    val e3 = eval(Binary(Plus, e1, e2))
+    assert(e3 === S("aundefined"))
+  }
+
   "Minus" should "subtract two number values and return a number" in {
     val e1 = N(3)
     val e2 = N(1)
     val e3 = eval(Binary(Minus, e1, e2))
     assert(e3 === N(2))
+
+    val e4 = B(true)
+    val e5 = N(2)
+    val e6 = eval(Binary(Minus, e4, e5))
+    assert(e6 === N(-1))
+  }
+
+  it should "return NaN for all types that are not a number" in {
+    val e4 = S("test")
+    val e5 = N(2)
+    val e6 = eval(Binary(Minus, e4, e5))
+    assert(toNumber(e6).equals(Double.NaN))
+
+    val e7 = Undefined
+    val e8 = N(2)
+    val e9 = eval(Binary(Minus, e7, e8))
+    assert(toNumber(e9).equals(Double.NaN))
   }
 
   "Times" should "multiply two number values and return a number" in {
@@ -66,9 +114,54 @@ class Lab2Spec(lab2: Lab2Like) extends FlatSpec {
     val e2 = N(2)
     val e3 = eval(Binary(Times, e1, e2))
     assert(e3 === N(6))
+
+    val e4 = B(true)
+    val e5 = N(2)
+    val e6 = eval(Binary(Times, e4, e5))
+    assert(e6 === N(2))
   }
 
-  "Div" should "divide two number values and return a number" in {
+  it should "return NaN for all types that are not a number" in {
+    val e4 = S("test")
+    val e5 = N(2)
+    val e6 = eval(Binary(Times, e4, e5))
+    assert(toNumber(e6).equals(Double.NaN))
+
+    val e7 = Undefined
+    val e8 = N(2)
+    val e9 = eval(Binary(Times, e7, e8))
+    assert(toNumber(e9).equals(Double.NaN))
+  }
+
+  "Div" should "Divide two number values and return a number" in {
+    val e1 = N(10)
+    val e2 = N(2)
+    val e3 = eval(Binary(Div, e1, e2))
+    assert(e3 === N(5))
+
+    val e4 = B(true)
+    val e5 = N(8)
+    val e6 = eval(Binary(Div, e5, e4))
+    assert(e6 === N(8))
+
+    val e7 = N(10)
+    val e8 = N(0)
+    val e9 = eval(Binary(Div, e7, e8))
+    assert(toNumber(e9).equals(Double.PositiveInfinity))
+  }
+
+  it should "return NaN for all types that are not a number" in {
+    val e4 = S("test")
+    val e5 = N(2)
+    val e6 = eval(Binary(Div, e4, e5))
+    assert(toNumber(e6).equals(Double.NaN))
+
+    val e7 = Undefined
+    val e8 = N(2)
+    val e9 = eval(Binary(Div, e7, e8))
+    assert(toNumber(e9).equals(Double.NaN))
+  }
+  it should "divide two number values and return a number" in {
     val e1 = N(8)
     val e2 = N(5)
     val e3 = eval(Binary(Div, e1, e2))
@@ -86,9 +179,19 @@ class Lab2Spec(lab2: Lab2Like) extends FlatSpec {
     val e2 = N(5)
     val e3 = eval(Binary(Eq, e1, e2))
     assert(e3 === B(true))
+
     val e4 = S("5")
     val e5 = eval(Binary(Eq, e1, e4))
     assert(e5 === B(false))
+
+    val e6 = S("a")
+    val e7 = S("a")
+    val e8 = eval(Binary(Eq, e6, e7))
+    assert(e8 === B(true))
+
+    val e9 = S("b")
+    val e10 = eval(Binary(Eq, e9, e7))
+    assert(e10 === B(false))
   }
   
   it should "return false if two numerical values are not the same" in {
@@ -96,6 +199,14 @@ class Lab2Spec(lab2: Lab2Like) extends FlatSpec {
     val e2 = N(7)
     val e3 = eval(Binary(Eq, e1, e2))
     assert(e3 === B(false))
+
+    val e4 = Undefined
+    val e5 = Undefined
+    val e6 = eval(Binary(Eq, e4, e5))
+    assert(e6 === B(true))
+
+    val e7 = eval(Binary(Eq, e4, e1))
+    assert(e7 === B(false))
   }
 
   "Ne" should "return true if two numerical values are different" in {

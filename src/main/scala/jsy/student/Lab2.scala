@@ -99,6 +99,7 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
       case N(n) => N(n)
       case S(s) => S(s)
       case B(b) => B(b)
+      /* Inductive Cases */
       case Unary(uop, e1) => {
         uop match {
           case Neg => N(0 - toNumber(eval(env,e1)))
@@ -107,10 +108,31 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
       }
       case Binary(bop, e1, e2) => {
         bop match {
-          case Plus   => N(toNumber(eval(env,e1)) + toNumber(eval(env,e2)))
-          case Minus  => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
-          case Times  => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
-          case Div    => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
+          case Plus             => (eval(env,e1),eval(env,e2)) match {
+            case (S(s), _)      => S(toStr(eval(env,e1)) + toStr(eval(env,e2)))
+            case (_, S(s))      => S(toStr(eval(env,e1)) + toStr(eval(env,e2)))
+            case (Undefined, _) => S(toStr(eval(env,e1)) + toStr(eval(env,e2)))
+            case (_, Undefined) => S(toStr(eval(env,e1)) + toStr(eval(env,e2)))
+            case _              => N(toNumber(eval(env,e1)) + toNumber(eval(env,e2)))
+          }
+          case Minus            => (eval(env,e1),eval(env,e2)) match {
+            case (B(b), _)      => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
+            case (_, B(b))      => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
+            case (N(n1), N(n2)) => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
+            case _              => N(Double.NaN)
+          }
+          case Times            => (eval(env,e1),eval(env,e2)) match {
+            case (B(b), _)      => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
+            case (_, B(b))      => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
+            case (N(n1), N(n2)) => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
+            case _              => N(Double.NaN)
+          }
+          case Div            => (eval(env,e1),eval(env,e2)) match {
+            case (B(b), _)      => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
+            case (_, B(b))      => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
+            case (N(n1), N(n2)) => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
+            case _              => N(Double.NaN)
+          }
           case Eq     => B(eval(env,e1) == eval(env,e2))
           case Ne     => B(eval(env,e1) != eval(env,e2))
           case Lt     => B(toNumber(eval(env,e1)) < toNumber(eval(env,e2)))
@@ -122,11 +144,9 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
           case Seq    => eval(env,e1); eval(env,e2)
         }
       }
-      /* Inductive Cases */
-      case Print(e1) => println(pretty(eval(env, e1))); Undefined
       case If(e1, e2, e3) => ???
       case ConstDecl(x, e1, e2) => ???
-
+      case Print(e1) => println(pretty(eval(env, e1))); Undefined
       case _ => ???
     }
   }
