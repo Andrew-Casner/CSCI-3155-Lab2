@@ -64,9 +64,9 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
       case N(n) => n
       case B(true) => 1.0
       case B(false) => 0.0
-      case S(s) => try s.toDouble catch {case _ => Double.NaN}
+      case S(s) => try s.toDouble catch {case _: Throwable => Double.NaN}
       case Undefined => Double.NaN
-      case _ => Double.NaN
+      case _ => throw new UnsupportedOperationException
     }
   }
 
@@ -74,10 +74,10 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
     require(isValue(v))
     (v: @unchecked) match {
       case B(b) => b
-      case N(n) => if(n == 0.0 || n == -0.0 || n == Double.NaN) false else true
+      case N(n) => if(n == 0.0 || n == -0.0 || n.isNaN) false else true
       case S(s) => if(s=="") false else true
       case Undefined => false
-      case _ => false
+      case _ => throw new UnsupportedOperationException
     }
   }
 
@@ -85,10 +85,10 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
     require(isValue(v))
     (v: @unchecked) match {
       case S(s) => s
+      case N(n) => if(n.isWhole) "%.0f" format n else n.toString
+      case B(b) => b.toString
       case Undefined => "undefined"
-      case B(b) => b.toString()
-      case N(n) => n.toString()
-      case _ => ""
+      case _ => throw new UnsupportedOperationException
     }
   }
 
@@ -96,58 +96,54 @@ object Lab2 extends jsy.util.JsyApplication with Lab2Like {
     e match {
       /* Base Cases */
       case Undefined => Undefined
-      case N(n) => N(n)
-      case S(s) => S(s)
-      case B(b) => B(b)
+      case N(n)      => N(n)
+      case S(s)      => S(s)
+      case B(b)      => B(b)
+      case Var(x)    => eval(env,lookup(env, x))
       /* Inductive Cases */
       case Unary(uop, e1) => {
         uop match {
-          case Neg => N(0 - toNumber(eval(env,e1)))
-          case Not => B(!toBoolean(eval(env,e1)))
+          case Neg        => N(-1 * toNumber(eval(env,e1)))
+          case Not        => B(!toBoolean(eval(env,e1)))
         }
       }
-      case Binary(bop, e1, e2) => {
+      case Binary(bop, e1, e2)  => {
         bop match {
           case Plus             => (eval(env,e1),eval(env,e2)) match {
             case (S(s), _)      => S(toStr(eval(env,e1)) + toStr(eval(env,e2)))
             case (_, S(s))      => S(toStr(eval(env,e1)) + toStr(eval(env,e2)))
-            case (Undefined, _) => S(toStr(eval(env,e1)) + toStr(eval(env,e2)))
-            case (_, Undefined) => S(toStr(eval(env,e1)) + toStr(eval(env,e2)))
             case _              => N(toNumber(eval(env,e1)) + toNumber(eval(env,e2)))
           }
-          case Minus            => (eval(env,e1),eval(env,e2)) match {
-            case (B(b), _)      => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
-            case (_, B(b))      => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
-            case (N(n1), N(n2)) => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
-            case _              => N(Double.NaN)
+          case Minus            => N(toNumber(eval(env,e1)) - toNumber(eval(env,e2)))
+          case Times            => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
+          case Div              => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
+          case Eq               => B(eval(env,e1) == eval(env,e2))
+          case Ne               => B(eval(env,e1) != eval(env,e2))
+          case Lt               => (eval(env,e1),eval(env,e2)) match {
+            case (S(s1), S(s2)) => B(toStr(eval(env,e1)) < toStr(eval(env,e2)))
+            case _              => B(toNumber(eval(env,e1)) < toNumber(eval(env,e2)))
           }
-          case Times            => (eval(env,e1),eval(env,e2)) match {
-            case (B(b), _)      => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
-            case (_, B(b))      => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
-            case (N(n1), N(n2)) => N(toNumber(eval(env,e1)) * toNumber(eval(env,e2)))
-            case _              => N(Double.NaN)
+          case Le               => (eval(env,e1),eval(env,e2)) match {
+            case (S(s1), S(s2)) => B(toStr(eval(env,e1)) <= toStr(eval(env,e2)))
+            case _              => B(toNumber(eval(env,e1)) <= toNumber(eval(env,e2)))
           }
-          case Div            => (eval(env,e1),eval(env,e2)) match {
-            case (B(b), _)      => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
-            case (_, B(b))      => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
-            case (N(n1), N(n2)) => N(toNumber(eval(env,e1)) / toNumber(eval(env,e2)))
-            case _              => N(Double.NaN)
+          case Gt               => (eval(env,e1),eval(env,e2)) match {
+            case (S(s1), S(s2)) => B(toStr(eval(env,e1)) > toStr(eval(env,e2)))
+            case _              => B(toNumber(eval(env,e1)) > toNumber(eval(env,e2)))
           }
-          case Eq     => B(eval(env,e1) == eval(env,e2))
-          case Ne     => B(eval(env,e1) != eval(env,e2))
-          case Lt     => B(toNumber(eval(env,e1)) < toNumber(eval(env,e2)))
-          case Le     => B(toNumber(eval(env,e1)) <= toNumber(eval(env,e2)))
-          case Gt     => B(toNumber(eval(env,e1)) > toNumber(eval(env,e2)))
-          case Ge     => B(toNumber(eval(env,e1)) >= toNumber(eval(env,e2)))
-          case And    => if(toBoolean(eval(env,e1))) eval(env,e2) else eval(env,e1)
-          case Or     => if(toBoolean(eval(env,e1))) eval(env,e1) else eval(env,e2)
-          case Seq    => eval(env,e1); eval(env,e2)
+          case Ge               => (eval(env,e1),eval(env,e2)) match {
+            case (S(s1), S(s2)) => B(toStr(eval(env,e1)) >= toStr(eval(env,e2)))
+            case _              => B(toNumber(eval(env,e1)) >= toNumber(eval(env,e2)))
+          }
+          case And              => if(toBoolean(eval(env,e1))) eval(env,e2) else eval(env,e1)
+          case Or               => if(toBoolean(eval(env,e1))) eval(env,e1) else eval(env,e2)
+          case Seq              => eval(env,e1); eval(env,e2)
         }
       }
-      case If(e1, e2, e3) => ???
-      case ConstDecl(x, e1, e2) => ???
-      case Print(e1) => println(pretty(eval(env, e1))); Undefined
-      case _ => ???
+      case If(e1, e2, e3)       => if(toBoolean(eval(env,e1))) eval(env,e2) else eval(env,e3)
+      case ConstDecl(x, e1, e2) => eval(extend(env,x,eval(env,e1)), e2)
+      case Print(e1)            => println(pretty(eval(env, e1))); Undefined
+      case _                    => ???
     }
   }
 
